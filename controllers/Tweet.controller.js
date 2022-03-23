@@ -58,11 +58,13 @@ exports.getTweet = async (req,res) => {
             limit : size,
             attributes : ['tweet','position','createdAt']
         });
+        let d = data.rows.map((val) => {
+            return { "tweet" : val.tweet, "position" : val.position.coordinates,"createdAt" : timeAgo.format(val.createdAt)}
+        })
         return res.status(200).send({
             status : "Success",
             message : "Tweets from nearby locations",
-            data : data.rows,
-            timestamp : timeAgo.format(new Date()),
+            data : d,
             noOfPages : parseInt(data.count/size) + (data.count%size > 0 ?1:0)
         })
     }
