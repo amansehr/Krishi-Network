@@ -1,6 +1,11 @@
 const TWEET = require("../services/db.service").addTweet;
 const axios = require('axios').default;
 const {Sequelize} = require("../services/db.service");
+const TimeAgo = require('javascript-time-ago')
+const en = require('javascript-time-ago/locale/en.json')
+TimeAgo.addDefaultLocale(en)
+const timeAgo = new TimeAgo('en-US')
+
 /** Add Tweet
  * 
  * @param {*} req 
@@ -51,11 +56,13 @@ exports.getTweet = async (req,res) => {
             where: Sequelize.where(Sequelize.fn('ST_DWithin',Sequelize.col('position'),Sequelize.fn('ST_SetSRID',Sequelize.fn('ST_MakePoint',req.query.lon, req.query.lat),4326),0.032),true),
             offset : startIndex,
             limit : size,
+            attributes : ['tweet','position','createdAt']
         });
         return res.status(200).send({
             status : "Success",
             message : "Tweets from nearby locations",
             data : data.rows,
+            timestamp : timeAgo.format(new Date()),
             noOfPages : parseInt(data.count/size) + (data.count%size > 0 ?1:0)
         })
     }
