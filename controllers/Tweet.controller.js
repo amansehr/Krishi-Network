@@ -1,6 +1,6 @@
 const TWEET = require("../services/db.service").addTweet;
 const axios = require('axios').default;
-
+const {Sequelize} = require("../services/db.service");
 /** Add Tweet
  * 
  * @param {*} req 
@@ -22,7 +22,7 @@ exports.postTweet = async (req,res) => {
             position : point
         });
 
-        return res.send(201).send({
+        return res.status(201).send({
             status : "Sucess",
             message : `Tweet: ${req.body.tweet} is successfully tweeted by user: ${req.user.emailId}`
         })
@@ -44,14 +44,6 @@ exports.postTweet = async (req,res) => {
 
 exports.getTweet = async (req,res) => {
     try{
-        var reg = new RegExp("^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}");
-        //latitude and longitude validation
-        if(!reg.exec(req.query.lat) || !reg.exec(req.query.lon)){
-            return res.status(400).send({
-                status : "Failed",
-                message : "Bad Input"
-            })
-        }
         let size = parseInt(req.query['pagesize']);
         let startIndex = (parseInt(req.query['pagenumber'])-1)*size;
 
@@ -68,6 +60,7 @@ exports.getTweet = async (req,res) => {
         })
     }
     catch(e){
+        console.log(e)
         return res.status(500).send({
             status: "Failed",
             message: "Server Side Error",
@@ -83,17 +76,17 @@ exports.getTweet = async (req,res) => {
 */
 exports.getWeather = async (req,res) => {
     try{
-        let data = axios({
-            method: 'get',
-            url: `https://api.openweathermap.org/data/2.5/weather?lat=${req.query.lat}&lon=${req.query.lon}&appid=f60e194dfe952ee4ddb833606a707267`,
-          });
+        console.log("a")
+        let data = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${req.query.lat}&lon=${req.query.lon}&appid=f60e194dfe952ee4ddb833606a707267`,
+        );
         return res.status(200).send({
             status : "Success",
             message : "Weather data",
-            data : data
+            data : data.data
         })
     }   
     catch(e){
+        console.log(e)
         return res.status(500).send({
             status: "Failed",
             message: "Server Side Error",
