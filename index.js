@@ -13,7 +13,9 @@ const PORT = process.env.PORT || 8081;
 
 //start the server
 app.listen(PORT,console.log(`server started in ${process.env.NODE_ENV} mode at port ${PORT}`));
-app.get('/',(req,res) => res.send({data : 1}))
+app.get('/',(req,res) => res.send({
+    message : "Api index route"
+}))
 
 //routes
 const auth = require("./routes/auth.routes");
